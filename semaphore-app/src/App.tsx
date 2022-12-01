@@ -1,142 +1,218 @@
-import { useState } from 'react';
-import Web3 from 'web3';
-import { ethers, utils } from 'ethers';
+import { useState, useEffect } from 'react';
+import jsonSema from './semaphore.json';
 import contractABI from './GreeterABI.json';
-import { Identity } from '@semaphore-protocol/identity'
-import { Group } from '@semaphore-protocol/group';
-import { generateProof, packToSolidityProof } from '@semaphore-protocol/proof';
 import './App.css';
+import { Identity } from "@semaphore-protocol/identity"
+import { Group } from "@semaphore-protocol/group"
+import { generateProof, verifyProof, packToSolidityProof } from "@semaphore-protocol/proof"
 
-function App(): JSX.Element {
-  // Identity
-  const [identity, setIdentity] = useState<Identity>();
-  const [trapdoor, setTrapdoor] = useState<bigint>(BigInt(0));
-  const [nullifier, setNullifier] = useState<bigint>(BigInt(0));
-  const [commitment, setCommitment] = useState<bigint>(BigInt(0));
+const Web3js = require("web3");
+const ethers = require("ethers");
 
-  // Group
-  const [group, setGroup] = useState<Group>();
-  const [userCommitment, setUserCommitment] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
+const verificationKey = jsonSema
 
-  // Proof
-  const externalNullifier = BigInt(1);
-  const [signal, setSignal] = useState<string>('');
+const contractAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "identityCommitment",
+				"type": "uint256"
+			}
+		],
+		"name": "joinGroup",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "semaphoreAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_groupId",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "identityCommitment",
+				"type": "uint256"
+			}
+		],
+		"name": "NewUser",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "vote",
+				"type": "bytes32"
+			}
+		],
+		"name": "NewVote",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "myVote",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "merkleTreeRoot",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "nullifierHash",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256[8]",
+				"name": "proof",
+				"type": "uint256[8]"
+			}
+		],
+		"name": "vote",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getCommitments",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "groupId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "semaphore",
+		"outputs": [
+			{
+				"internalType": "contract ISemaphore",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
 
-  // Connection to the contract
-  const contractAddress = '0x3aa5ebb10dc797cac828524e59a333d0a371443c'; // Goerli
-  let contract: ethers.Contract;
+const contractAddress = "0x322813fd9a801c5507c9de605d63cea4f2ce6c44"
 
-  const loadData = () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    contract = new ethers.Contract(contractAddress, contractABI, provider);
-    console.log(contract);
+
+function App() {
+  
+  const [identity, setIdentity] = useState(null)
+  const [web3, setWeb3] = useState(null)
+  const [contract, setContract] = useState(null)
+  
+  useEffect(() => {
+    if (window.ethereum) {
+      window.ethereum.request({ method: "eth_requestAccounts" })
+      let web3_;
+      if (!contract) {
+        web3_ = new Web3js(window.ethereum);
+        setWeb3(web3_);
+        setContract(new web3_.eth.Contract(contractABI, contractAddress));
+      }
+    }
+  }, [])
+
+  async function createIdentity() {
+    const identity = new Identity()
+    // @ts-ignore
+    setIdentity(identity)
   }
 
-  const joinGroupOnChain = async () => {
-    if (!userCommitment || !username) return;
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send('eth_requestAccounts', []);
-    const signer = provider.getSigner();
-    console.log('signer', signer);
+  async function joinGroup() {
 
-    const myContract = new ethers.Contract(contractAddress, contractABI, signer);
-    console.log('contract', myContract);
+    // @ts-ignore
+    console.log(identity.generateCommitment());
 
-    const dfd = utils.hexZeroPad(Web3.utils.asciiToHex(username), 32);
-    console.log(dfd);
-    const result = await myContract.joinGroup(userCommitment, dfd);
-    console.log(result);
+    try {
+      // @ts-ignore
+      await contract.methods.joinGroup(identity.generateCommitment()).send({ from: window.ethereum.selectedAddress })
+      console.log("nice")
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  const createIdentity = () => {
-    const identity = new Identity();
-    console.log(identity.trapdoor);
-    setTrapdoor(identity.trapdoor);
-    setNullifier(identity.nullifier);
-    setCommitment(identity.commitment);
-    setIdentity(identity);
-  }
+  async function vote() {
+    const groupTemp = new Group()
+    // @ts-ignore
+    const users = await contract.methods.getCommitments().call({ from: window.ethereum.selectedAddress })
+    // @ts-ignore
+    const groupId = await contract.methods.groupId().call({ from: window.ethereum.selectedAddress })
+    console.log(users, groupId)
+    groupTemp.addMembers(users)
 
-  const createGroup = () => {
-    const group = new Group();
-    console.log('group', group);
-    setGroup(group);
-  }
+    // @ts-ignore
+    const data = web3.utils.asciiToHex("Hello World")
+	const greeting = ethers.utils.formatBytes32String("Hello World")
 
-  const addMember = () => {
-    if (!group || !userCommitment) return;
-    group.addMember(BigInt(userCommitment));
-    console.log('group', group);
-  }
+  // @ts-ignore
+    const proof = await generateProof(identity, groupTemp, groupId, greeting)
+    const solidityProof = packToSolidityProof(proof.proof)
 
-  const removeMember = () => {
-    if (!group || !userCommitment) return;
-    const index = group.indexOf(BigInt(userCommitment));
-    group.removeMember(index);
-    console.log('group', group);
-  }
-
-  const proofMembership = () => {
-    if (!group || !userCommitment) return;
-    const index = group.indexOf(BigInt(userCommitment));
-    const proof = group.generateProofOfMembership(index);
-    console.log('proof', proof);
-  }
-
-  const createProof = async () => {
-    if (!identity || !group) return;
-    const fullProof = await generateProof(identity, group, externalNullifier, signal);
-    console.log('fullProof', fullProof);
-    const solidityProof = await packToSolidityProof(fullProof.proof);
-    console.log('solidityProof', solidityProof);
-    const { nullifierHash } = fullProof.publicSignals
-    console.log('nullifierHash', nullifierHash);
+    verifyProof(verificationKey, proof).then((result) => {
+        // console.log("here", result)
+    }) //local verification
+	console.log("great", greeting)
+	console.log(greeting, " , ", proof.publicSignals.merkleRoot, " , ", proof.publicSignals.nullifierHash, " , ", solidityProof)
+  // @ts-ignore
+  const rec = await contract.methods.vote(greeting, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
+    console.log(rec)
   }
 
   return (
-    <>
-      <div className="App">
-        {/* Web3 provider */}
-        <div>
-          <button onClick={loadData}>load data</button>
-          <button onClick={joinGroupOnChain}>join group (on-chain)</button>
-          <br />
-          <input placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} />
-          <br />
-        </div>
-
-        <br />
-
-        {/* Identity */}
-        <div>
-          <button onClick={createIdentity}>Create identity</button>
-          <br />
-          { trapdoor?.toString() } { nullifier.toString() } { commitment.toString() }
-        </div>
-
-        <br />
-
-        {/* Group */}
-        <div>
-          <button onClick={createGroup}>Create group</button>
-          <button onClick={addMember}>Add member</button>
-          <button onClick={removeMember}>Remove member</button>
-          <button onClick={proofMembership}>Proof membership</button>
-          <br />
-          <input placeholder="user commitment" onChange={(e) => setUserCommitment(e.target.value)} />
-        </div>
-
-        <br />
-
-        {/* Proof */}
-        <div>
-          <input placeholder="signal" onChange={(e) => setSignal(e.target.value)} />
-          <button onClick={async () => await createProof()}>Proof</button>
-        </div>
-      </div>
-
-    </>
+    <div className="App">
+      <header className="App-header">
+        <button onClick={createIdentity}>Create Identity</button>
+        {identity && <p style={{width: "50vh", fontSize: "12px"}}>{(identity as any).toString()}</p>}
+        <button onClick={joinGroup}>Join group</button>
+        <button onClick={vote}>Vote</button>
+      </header>
+    </div>
   );
 }
 

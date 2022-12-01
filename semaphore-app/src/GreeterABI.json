@@ -2,6 +2,19 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "identityCommitment",
+				"type": "uint256"
+			}
+		],
+		"name": "joinGroup",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "semaphoreAddress",
 				"type": "address"
@@ -20,12 +33,12 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "bytes32",
-				"name": "greeting",
-				"type": "bytes32"
+				"internalType": "uint256",
+				"name": "identityCommitment",
+				"type": "uint256"
 			}
 		],
-		"name": "NewGreeting",
+		"name": "NewUser",
 		"type": "event"
 	},
 	{
@@ -33,25 +46,19 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "uint256",
-				"name": "identityCommitment",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
 				"internalType": "bytes32",
-				"name": "username",
+				"name": "vote",
 				"type": "bytes32"
 			}
 		],
-		"name": "NewUser",
+		"name": "NewVote",
 		"type": "event"
 	},
 	{
 		"inputs": [
 			{
 				"internalType": "bytes32",
-				"name": "greeting",
+				"name": "myVote",
 				"type": "bytes32"
 			},
 			{
@@ -70,27 +77,35 @@
 				"type": "uint256[8]"
 			}
 		],
-		"name": "greet",
+		"name": "vote",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "getCommitments",
+		"outputs": [
 			{
-				"internalType": "uint256",
-				"name": "identityCommitment",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "username",
-				"type": "bytes32"
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
 			}
 		],
-		"name": "joinGroup",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "groupId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{

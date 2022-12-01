@@ -1,18 +1,17 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 
-/// @title Greeter contract.
-/// @dev The following code is just a example to show how Semaphore con be used.
-contract Greeter  {
-    event NewGreeting(bytes32 greeting);
-    event NewUser(uint256 identityCommitment, bytes32 username);
+contract Voter  {
+    event NewVote(bytes32 vote);
+    event NewUser(uint256 identityCommitment);
 
     ISemaphore public semaphore;
 
-    uint256 groupId;
-    mapping(uint256 => bytes32) public users;
+    uint256 public groupId;
+    // mapping(uint256 => bool) nullifiers;
+    uint[] commitments;
 
     constructor(address semaphoreAddress, uint256 _groupId) {
         semaphore = ISemaphore(semaphoreAddress);
@@ -21,24 +20,26 @@ contract Greeter  {
         semaphore.createGroup(groupId, 20, 0, address(this));
     }
 
-    function joinGroup(uint256 identityCommitment, bytes32 username) external returns (bytes32, uint256, bytes32) {
+    function joinGroup(uint256 identityCommitment) external {
         semaphore.addMember(groupId, identityCommitment);
+        commitments.push(identityCommitment);
 
-        users[identityCommitment] = username;
-
-        emit NewUser(identityCommitment, username);
-
-        return (users[identityCommitment], identityCommitment, username);
+        emit NewUser(identityCommitment);
     }
 
-    function greet(
-        bytes32 greeting,
+    function getCommitments() external view returns(uint[] memory) {
+        return commitments;
+    }
+
+    function vote(
+        bytes32 myVote,
         uint256 merkleTreeRoot,
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) external {
-        semaphore.verifyProof(groupId, merkleTreeRoot, greeting, nullifierHash, groupId, proof);
+        // require(nullifiers[nullifierHash] == false, "already voted");
+        semaphore.verifyProof(groupId, merkleTreeRoot, myVote, nullifierHash, groupId, proof);
 
-        emit NewGreeting(greeting);
+        emit NewVote(myVote);
     }
 }

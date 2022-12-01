@@ -21,7 +21,7 @@ task("deploy", "Deploy a Greeter contract")
             semaphoreAddress = address
         }
 
-        const Greeter = await ethers.getContractFactory("Greeter")
+        const Greeter = await ethers.getContractFactory("Voter")
 
         const greeter = await Greeter.deploy(semaphoreAddress, groupId)
 
