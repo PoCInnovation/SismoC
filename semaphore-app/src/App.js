@@ -7,27 +7,7 @@ import { generateProof, verifyProof, packToSolidityProof } from "@semaphore-prot
 
 const Web3js = require("web3");
 
-
-// const identity = new Identity()
-// const group = new Group()
-// group.addMember(identity.commitment)
-// console.log(group.members)
-
-// console.log(identity.toString())
-
-// const externalNullifier = group.root
-// const signal = "test"
-
 const verificationKey = jsonSema
-
-// generateProof(identity, group, externalNullifier, signal).then((proof) => {
-//   console.log(proof)
-//   verifyProof(verificationKey, proof).then((result) => {
-//     console.log(result)
-//   })
-// }).catch((err) => {
-//   console.log(err)
-// })
 
 const contractAbi = [
 	{
@@ -203,7 +183,7 @@ function App() {
 
     verifyProof(verificationKey, proof).then((result) => {
         console.log("here", result)
-    })
+    }) //local verification
     const rec = await contract.methods.vote(data, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
     console.log(rec)
   }
