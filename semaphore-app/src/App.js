@@ -6,10 +6,24 @@ import { Group } from "@semaphore-protocol/group"
 import { generateProof, verifyProof, packToSolidityProof } from "@semaphore-protocol/proof"
 
 const Web3js = require("web3");
+const ethers = require("ethers");
 
 const verificationKey = jsonSema
 
 const contractAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "identityCommitment",
+				"type": "uint256"
+			}
+		],
+		"name": "joinGroup",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
@@ -53,58 +67,6 @@ const contractAbi = [
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "getCommitments",
-		"outputs": [
-			{
-				"internalType": "uint256[]",
-				"name": "",
-				"type": "uint256[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "groupId",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "identityCommitment",
-				"type": "uint256"
-			}
-		],
-		"name": "joinGroup",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "semaphore",
-		"outputs": [
-			{
-				"internalType": "contract ISemaphore",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "bytes32",
@@ -131,10 +93,49 @@ const contractAbi = [
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getCommitments",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "groupId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "semaphore",
+		"outputs": [
+			{
+				"internalType": "contract ISemaphore",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]
 
-const contractAddress = "0xa044E4EC937a244178910cBeADc6AFEE0c5cd378"
+const contractAddress = "0x5296a65cd27537a2C3558286c1Bf1EA1C3b0f16C"
 
 
 function App() {
@@ -177,14 +178,17 @@ function App() {
     groupTemp.addMembers(users)
 
     const data = web3.utils.asciiToHex("Hello World")
+	const greeting = ethers.utils.formatBytes32String("Hello World")
 
-    const proof = await generateProof(identity, groupTemp, groupId, data)
+    const proof = await generateProof(identity, groupTemp, groupId, greeting)
     const solidityProof = packToSolidityProof(proof.proof)
 
     verifyProof(verificationKey, proof).then((result) => {
-        console.log("here", result)
+        // console.log("here", result)
     }) //local verification
-    const rec = await contract.methods.vote(data, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
+	console.log("great", greeting)
+	console.log(greeting, " , ", proof.publicSignals.merkleRoot, " , ", proof.publicSignals.nullifierHash, " , ", solidityProof)
+    const rec = await contract.methods.vote(greeting, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
     console.log(rec)
   }
 
