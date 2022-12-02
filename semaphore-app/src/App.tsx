@@ -9,142 +9,13 @@ import { generateProof, verifyProof, packToSolidityProof } from "@semaphore-prot
 const Web3js = require("web3");
 const ethers = require("ethers");
 
-const verificationKey = jsonSema
-
-const contractAbi = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "identityCommitment",
-				"type": "uint256"
-			}
-		],
-		"name": "joinGroup",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "semaphoreAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_groupId",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "identityCommitment",
-				"type": "uint256"
-			}
-		],
-		"name": "NewUser",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "bytes32",
-				"name": "vote",
-				"type": "bytes32"
-			}
-		],
-		"name": "NewVote",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes32",
-				"name": "myVote",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "uint256",
-				"name": "merkleTreeRoot",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "nullifierHash",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256[8]",
-				"name": "proof",
-				"type": "uint256[8]"
-			}
-		],
-		"name": "vote",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getCommitments",
-		"outputs": [
-			{
-				"internalType": "uint256[]",
-				"name": "",
-				"type": "uint256[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "groupId",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "semaphore",
-		"outputs": [
-			{
-				"internalType": "contract ISemaphore",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
-
-const contractAddress = "0x322813fd9a801c5507c9de605d63cea4f2ce6c44"
-
+const contractAddress = "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9"
 
 function App() {
-  
-  const [identity, setIdentity] = useState(null)
-  const [web3, setWeb3] = useState(null)
-  const [contract, setContract] = useState(null)
-  
+  const [identity, setIdentity] = useState<Identity | null>(null)
+  const [web3, setWeb3] = useState<any>(null)
+  const [contract, setContract] = useState<any>(null)
+
   useEffect(() => {
     if (window.ethereum) {
       window.ethereum.request({ method: "eth_requestAccounts" })
@@ -159,17 +30,12 @@ function App() {
 
   async function createIdentity() {
     const identity = new Identity()
-    // @ts-ignore
     setIdentity(identity)
   }
 
   async function joinGroup() {
-
-    // @ts-ignore
-    console.log(identity.generateCommitment());
-
     try {
-      // @ts-ignore
+	  if (!identity) return;
       await contract.methods.joinGroup(identity.generateCommitment()).send({ from: window.ethereum.selectedAddress })
       console.log("nice")
     } catch (err) {
@@ -178,29 +44,22 @@ function App() {
   }
 
   async function vote() {
+	if (!identity) return;
+
     const groupTemp = new Group()
-    // @ts-ignore
     const users = await contract.methods.getCommitments().call({ from: window.ethereum.selectedAddress })
-    // @ts-ignore
     const groupId = await contract.methods.groupId().call({ from: window.ethereum.selectedAddress })
     console.log(users, groupId)
     groupTemp.addMembers(users)
 
-    // @ts-ignore
-    const data = web3.utils.asciiToHex("Hello World")
 	const greeting = ethers.utils.formatBytes32String("Hello World")
 
-  // @ts-ignore
     const proof = await generateProof(identity, groupTemp, groupId, greeting)
     const solidityProof = packToSolidityProof(proof.proof)
 
-    verifyProof(verificationKey, proof).then((result) => {
-        // console.log("here", result)
-    }) //local verification
 	console.log("great", greeting)
 	console.log(greeting, " , ", proof.publicSignals.merkleRoot, " , ", proof.publicSignals.nullifierHash, " , ", solidityProof)
-  // @ts-ignore
-  const rec = await contract.methods.vote(greeting, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
+	const rec = await contract.methods.vote(greeting, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
     console.log(rec)
   }
 
