@@ -2,7 +2,7 @@
 
 # SismoC
 
-Création d’un Zero knowledge attester on chain, en utilisant le protocole Semaphore, avec pour but de l’intégrer au cotés des autres attester Sismo.
+Creation of a zero-knowledge attester on chain, using the Semaphore protocol, with the goal of integrating it with the other Sismo attesters.
 
 ## How does it work?
 
