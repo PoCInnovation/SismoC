@@ -6,8 +6,8 @@ import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 
 // Core protocol Protocol imports
 // sismo/sismo-protocol-main/contracts/core
-import {Request, Attestation, Claim} from '../sismo-protocol-main/contracts/core/libs/Structs.sol';
-import {Attester, IAttester, IAttestationsRegistry} from '../sismo-protocol-main/contracts/core/Attester.sol';
+import {Request, Attestation, Claim} from './sismo-protocol-main/contracts/core/libs/Structs.sol';
+import {Attester, IAttester, IAttestationsRegistry} from './sismo-protocol-main/contracts/core/Attester.sol';
 
 contract AttesterERC20 is Attester, Ownable {
 
@@ -34,7 +34,7 @@ contract AttesterERC20 is Attester, Ownable {
 
   }
 
-  function buildAttestations(Request calldata request, bytes calldata) public view virtual override(IAttester, Attester) returns (Attestation[] memory)
+  function buildAttestations(Request calldata request, bytes calldata) public view virtual override returns (Attestation[] memory)
   {
   }
 }
