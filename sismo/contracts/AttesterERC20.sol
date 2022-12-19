@@ -6,10 +6,10 @@ import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 
 // Core protocol Protocol imports
 // sismo/sismo-protocol-main/contracts/core
-import {Request, Attestation, Claim} from './sismo-protocol-main/contracts/core/libs/Structs.sol';
-import {Attester, IAttester, IAttestationsRegistry} from './sismo-protocol-main/contracts/core/Attester.sol';
+import {Request, Attestation, Claim} from '../sismo-protocol-main/contracts/core/libs/Structs.sol';
+import {Attester, IAttester, IAttestationsRegistry} from '../sismo-protocol-main/contracts/core/Attester.sol';
 
-contract Pythia1SimpleAttester is Attester, Ownable {
+contract AttesterERC20 is Attester, Ownable {
 
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
