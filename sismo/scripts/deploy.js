@@ -7,7 +7,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  const ownerWallet = "0xdE8Cd88AcF910A8fDbE9936Cb68cB23F5a96157c";
+  const ownerWallet = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
   let attestationsRegistryAddress = "";
   let collectionIdFirst = 10_000;
   let collectionIdLast = 20_000;
@@ -27,6 +27,11 @@ async function main() {
   const attester = await Attester.deploy(ownerWallet, registry.address, collectionIdFirst, collectionIdLast);
   await attester.deployed();
   console.log(`Attester deployed to ${attester.address}`);
+
+  const Token = await hre.ethers.getContractFactory('myERC20');
+  const token = await Token.deploy(ownerWallet, "IsmaToken", "ISMA");
+  await token.deployed();
+  console.log(`Token deployed to ${token.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
