@@ -22,11 +22,11 @@ contract AttesterERC20 is Attester, Ownable {
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
    */
-  constructor(address attestationsRegistryAddress, uint256 collectionIdFirst, uint256 collectionIdLast) Attester(attestationsRegistryAddress)
+  constructor(address owner, address attestationsRegistryAddress, uint256 collectionIdFirst, uint256 collectionIdLast) Attester(attestationsRegistryAddress)
   {
     AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
     AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
-    _transferOwnership(address(this));
+    _transferOwnership(owner);
   }
 
   function _verifyRequest(Request calldata request, bytes calldata proofData) internal virtual override
