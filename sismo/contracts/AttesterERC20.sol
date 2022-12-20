@@ -3,6 +3,7 @@
 pragma solidity ^0.8.14;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 // Core protocol Protocol imports
 // sismo/sismo-protocol-main/contracts/core
@@ -14,7 +15,8 @@ contract AttesterERC20 is Attester, Ownable {
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
 
-  mapping(uint256 => address) internal _ticketsDestinations;
+  mapping(address => uint256) internal _collectionsInternalMapping;
+  // uint256 _collectionsInternalMappingLength = 0;
 
   /**
    * @dev Constructor. Initializes the contract
@@ -31,10 +33,59 @@ contract AttesterERC20 is Attester, Ownable {
 
   function _verifyRequest(Request calldata request, bytes calldata proofData) internal virtual override
   {
+    Claim memory claim = request.claims[0];
 
+    address tokenAddress = address(uint160(claim.groupId));
+
+    uint256 tokenBalance = ERC20(tokenAddress).balanceOf(msg.sender);
+
+    require(tokenBalance >= claim.claimedValue, "Not Enough Tokens");
   }
 
   function buildAttestations(Request calldata request, bytes calldata) public view virtual override returns (Attestation[] memory)
   {
+    Attestation[] memory attestations = new Attestation[](1);
+
+    Claim memory claim = request.claims[0];
+
+    address ERC20Address = address(uint160(claim.groupId));
+
+    require(_collectionsInternalMapping[ERC20Address] != 0, "Group not added to the Attester");
+
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + _collectionsInternalMapping[ERC20Address];
+
+    attestations[0] = Attestation(
+      attestationCollectionId,
+      request.destination,
+      address(this),
+      claim.claimedValue,
+      uint32(block.timestamp),
+      ''
+    );
+    return (attestations);
   }
+
+  function addGroup(address ERC20Address) onlyOwner external
+  {
+    if (_collectionsInternalMapping[ERC20Address] == 0) {
+      _collectionsInternalMappingLength++;
+      _collectionsInternalMapping[ERC20Address] = _collectionsInternalMappingLength;
+    }
+  }
+
+// generateAttestations already in the Attester Contract
+//   function generateAttestations(Request calldata request, bytes calldata proofData) external override returns (Attestation[] memory)
+//   {
+//     _verifyRequest(request, proofData);
+
+//     Attestation[] memory attestations = buildAttestations(request, proofData);
+
+//     ATTESTATIONS_REGISTRY.recordAttestations(attestations);
+
+//     for (uint256 i = 0; i < attestations.length; i++) {
+//       emit AttestationGenerated(attestations[i]);
+//     }
+
+//     return attestations;
+//   }
 }
