@@ -15,8 +15,8 @@ contract AttesterERC20 is Attester, Ownable {
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
 
-  mapping(address => uint256) internal _collectionsInternalMapping;
-  uint256 _collectionsInternalMappingLength = 0;
+  mapping(address => uint256) public _collectionsInternalMapping;
+  uint256 public _collectionsInternalMappingLength = 0;
 
   /**
    * @dev Constructor. Initializes the contract
