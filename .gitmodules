@@ -1,0 +1,3 @@
+[submodule "sismo-proto"]
+	path = sismo-proto
+	url = git@github.com:sismo-core/sismo-protocol.git
