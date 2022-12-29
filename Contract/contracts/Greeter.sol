@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 
-contract Voter {
+contract Voter  {
     event NewVote(bytes32 vote);
     event NewUser(uint256 identityCommitment);
 
@@ -11,7 +11,7 @@ contract Voter {
 
     uint256 public groupId;
     // mapping(uint256 => bool) nullifiers;
-    uint256[] commitments;
+    uint[] commitments;
 
     constructor(address semaphoreAddress, uint256 _groupId) {
         semaphore = ISemaphore(semaphoreAddress);
@@ -27,7 +27,7 @@ contract Voter {
         emit NewUser(identityCommitment);
     }
 
-    function getCommitments() external view returns (uint256[] memory) {
+    function getCommitments() external view returns(uint[] memory) {
         return commitments;
     }
 
@@ -38,14 +38,7 @@ contract Voter {
         uint256[8] calldata proof
     ) external {
         // require(nullifiers[nullifierHash] == false, "already voted");
-        semaphore.verifyProof(
-            groupId,
-            merkleTreeRoot,
-            myVote,
-            nullifierHash,
-            groupId,
-            proof
-        );
+        semaphore.verifyProof(groupId, merkleTreeRoot, myVote, nullifierHash, groupId, proof);
 
         emit NewVote(myVote);
     }
