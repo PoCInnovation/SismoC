@@ -27,23 +27,23 @@ async function main() {
   console.log(`Registry deployed to ${registry.address}`);
 
   //Deploy Attester
-  const Attester = await hre.ethers.getContractFactory('AttesterERC20');
+  const Attester = await hre.ethers.getContractFactory('SemaphoreAttester');
   const attester = await Attester.deploy(owner.address, registry.address, collectionIdFirst, collectionIdLast);
   await attester.deployed();
   console.log(`Attester deployed to ${attester.address}`);
 
   //Deploy Token
-  const Token = await hre.ethers.getContractFactory('myERC20');
-  const token = await Token.deploy(owner.address, "IsmaToken", "ISMA");
-  await token.deployed();
-  console.log(`Token deployed to ${token.address}`);
+  // const Token = await hre.ethers.getContractFactory('myERC20');
+  // const token = await Token.deploy(owner.address, "IsmaToken", "ISMA");
+  // await token.deployed();
+  // console.log(`Token deployed to ${token.address}`);
 
   //Set up Roles / group id
   even_trigger_role = await badges.connect(owner).EVENT_TRIGGERER_ROLE();
   await badges.connect(owner).grantRole(even_trigger_role, registry.address);
   await badges.connect(owner).setAttestationsRegistry(registry.address);
   await registry.connect(owner).authorizeRange(attester.address, collectionIdFirst, collectionIdLast);
-  await attester.connect(owner).addGroup(token.address);
+  // await attester.connect(owner).addGroup(token.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
