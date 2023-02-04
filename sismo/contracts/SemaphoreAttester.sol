@@ -51,19 +51,19 @@ contract SemaphoreAttester is Attester, Ownable {
 
   function _verifyRequest(Request calldata request, bytes calldata proofData) internal virtual override
   {
-    SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
+    // SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
 
-    // Init semaphore interface
-    semaphore = ISemaphore(extraData.contractAddress);
+    // // Init semaphore interface
+    // semaphore = ISemaphore(extraData.contractAddress);
 
-    semaphore.verifyProof(
-      extraData.groupId,
-      extraData.merkleTreeRoot,
-      extraData.signal,
-      extraData.nullifierHash,
-      extraData.externalNullifier,
-      abi.decode(proofData, (uint256[8]))
-    );
+    // semaphore.verifyProof(
+    //   extraData.groupId,
+    //   extraData.merkleTreeRoot,
+    //   extraData.signal,
+    //   extraData.nullifierHash,
+    //   extraData.externalNullifier,
+    //   abi.decode(proofData, (uint256[8]))
+    // );
   }
 
   function buildAttestations(

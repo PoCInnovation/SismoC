@@ -10,8 +10,8 @@ import { generateProof, verifyProof, packToSolidityProof } from "@semaphore-prot
 const Web3js = require("web3");
 const ethers = require("ethers");
 
-const contractAddress = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788";
-const attesterAddress = "0x1613beB3B2C4f22Ee086B2b38C1476A3cE7f78E8"
+const contractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const attesterAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
 
 function App() {
   const [identity, setIdentity] = useState<Identity | null>(null)
@@ -69,11 +69,11 @@ function App() {
 
   async function getAttesttation() {
     if (!identity) return;
-  
+
       const groupTemp = new Group()
       const users = await contract.methods.getCommitments().call({ from: window.ethereum.selectedAddress })
       const groupId = await contract.methods.groupId().call({ from: window.ethereum.selectedAddress })
-      console.log(users, groupId)
+      console.log("user -> ", users, "  groupId ----> ", groupId)
       groupTemp.addMembers(users)
   
     const greeting = ethers.utils.formatBytes32String("Hello World")
@@ -89,29 +89,45 @@ function App() {
     // uint256 nullifierHash;
     // uint256 externalNullifier;
     // uint256 groupId;
-    // address contractAddress;  
+    // address contractAddress; 
+    console.log("####################")
+    console.log("aaaaaaaaaaaaaaaa")
+    console.log("####################")
+
     const rec = await attester.methods.generateAttestations(
         {
-          destination: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
           claims: [
             {
               groupId: 42,
               claimedValue: 2,
-              extraData: {
-                signal: greeting,
-                merkleTreeRoot: proof.publicSignals.merkleRoot,
-                nullifierHash: proof.publicSignals.nullifierHash,
-                externalNullifierHash: '',
-                groupId: 42,
-                contractAddress: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
-              }
+              extraData: web3.eth.abi.encodeParameter({
+                "SemaphoreProof": {
+                    "signal": 'bytes32',
+                    "merkleTreeRoot": 'uint256',
+                    "nullifierHash": "uint256",
+                    "externalNullifierHash": "uint256",
+                    "groupId": "uint256",
+                    "contractAddress": "address"
+                }},
+                {
+                  "signal": greeting,
+                  "merkleTreeRoot": proof.publicSignals.merkleRoot,
+                  "nullifierHash": proof.publicSignals.nullifierHash,
+                  "externalNullifierHash": 0,
+                  "groupId": 42,
+                  "contractAddress": '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
+                })
             }
-          ]
+          ],
+          destination: '0xdD2FD4581271e230360230F9337D5c0430Bf44C0',
         },
-        solidityProof,
-      )
-    console.log(rec)
+        web3.eth.abi.encodeParameter("uint256[8]", solidityProof)
+      ).call()
+    console.log("pppppppppppp ---> ", rec)
     }
+    console.log("####################")
+    console.log("bbbbbbbbbbbbbbbbbbbbb")
+    console.log("####################")
 
   return (
     <div className="App">

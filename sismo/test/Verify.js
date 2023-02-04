@@ -12,14 +12,13 @@ describe("Verify from react app", function () {
 
     //Deploy Badges
     const Badges = await hre.ethers.getContractFactory('Badges');
-    const badges = await Badges.attach("0x9E545E3C0baAB3E08CdfD552C960A1050f373042");
+    const badges = await Badges.attach("0x5FC8d32690cc91D4c39d9d3abcBD16989F875707");
     // await badges.deployed();
     // console.log(`Badges deployed to ${badges.address}`);
 
 
-    const res = await badges.balanceOf("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 10001);
+    const res = await badges.balanceOf("0xdD2FD4581271e230360230F9337D5c0430Bf44C0", 10001);
     console.log(res);
-
     expect(true).equal(true);
   });
 });
