@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import jsonSema from './semaphore.json';
 import contractABI from './GreeterABI.json';
 import attesterABI from './AttesterABI.json';
 import './App.css';
 import { Identity } from "@semaphore-protocol/identity"
 import { Group } from "@semaphore-protocol/group"
-import { generateProof, verifyProof, packToSolidityProof } from "@semaphore-protocol/proof"
+import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof"
 
 const Web3js = require("web3");
 const ethers = require("ethers");
@@ -30,7 +29,7 @@ function App() {
         setAttester(new web3_.eth.Contract(attesterABI, attesterAddress));
       }
     }
-  }, [])
+  }, [contract])
 
   async function createIdentity() {
     const identity = new Identity()
@@ -83,16 +82,6 @@ function App() {
   
     console.log("great", greeting)
     console.log(greeting, " , ", proof.publicSignals.merkleRoot, " , ", proof.publicSignals.nullifierHash, " , ", solidityProof)
-    // const rec = await contract.methods.vote(greeting, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress })
-    // bytes32 signal;
-    // uint256 merkleTreeRoot;
-    // uint256 nullifierHash;
-    // uint256 externalNullifier;
-    // uint256 groupId;
-    // address contractAddress; 
-    console.log("####################")
-    console.log("aaaaaaaaaaaaaaaa")
-    console.log("####################")
 
     const rec = await attester.methods.generateAttestations(
         {
@@ -123,11 +112,8 @@ function App() {
         },
         web3.eth.abi.encodeParameter("uint256[8]", solidityProof)
       ).call()
-    console.log("pppppppppppp ---> ", rec)
+    console.log("Badge ---> ", rec)
     }
-    console.log("####################")
-    console.log("bbbbbbbbbbbbbbbbbbbbb")
-    console.log("####################")
 
   return (
     <div className="App">

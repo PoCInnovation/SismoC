@@ -76,13 +76,9 @@ contract SemaphoreAttester is Attester, Ownable {
 
     Attestation[] memory attestations = new Attestation[](1);
 
-    // address ERC20Address = address(uint160(claim.groupId));
-
     require(_collectionsInternalMapping[extraData.contractAddress][extraData.groupId] != 0, "Group not added to the Attester");
 
     // uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + _collectionsInternalMapping[extraData.contractAddress][extraData.groupId];
-
-    // bindSemaphoreGroup(extraData.contractAddress, extraData.groupId, attestationCollectionId);
 
     attestations[0] = Attestation(
       10001,
@@ -92,7 +88,6 @@ contract SemaphoreAttester is Attester, Ownable {
       uint32(block.timestamp),
       ''
     );
-    console.log("%s && %s", attestations[0].owner, attestations[0].value);
     return (attestations);
   }
 
@@ -101,27 +96,4 @@ contract SemaphoreAttester is Attester, Ownable {
     _collectionsInternalMapping[_semaphoreAddress][_groupId] = _collectionsInternalMappingLength;
   }
 
-  // function addGroup(address ERC20Address) onlyOwner external
-  // {
-  //   if (_collectionsInternalMapping[ERC20Address] == 0) {
-  //     _collectionsInternalMappingLength++;
-  //     _collectionsInternalMapping[ERC20Address] = _collectionsInternalMappingLength;
-  //   }
-  // }
-
-// generateAttestations already in the Attester Contract
-//   function generateAttestations(Request calldata request, bytes calldata proofData) external override returns (Attestation[] memory)
-//   {
-//     _verifyRequest(request, proofData);
-
-//     Attestation[] memory attestations = buildAttestations(request, proofData);
-
-//     ATTESTATIONS_REGISTRY.recordAttestations(attestations);
-
-//     for (uint256 i = 0; i < attestations.length; i++) {
-//       emit AttestationGenerated(attestations[i]);
-//     }
-
-//     return attestations;
-//   }
 }
