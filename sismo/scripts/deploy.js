@@ -43,7 +43,7 @@ async function main() {
   await badges.connect(owner).grantRole(even_trigger_role, registry.address);
   await badges.connect(owner).setAttestationsRegistry(registry.address);
   await registry.connect(owner).authorizeRange(attester.address, collectionIdFirst, collectionIdLast);
-  // await attester.connect(owner).addGroup(token.address);
+  // await attester.connect(owner).addGroup(42);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

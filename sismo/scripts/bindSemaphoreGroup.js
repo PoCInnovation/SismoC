@@ -16,9 +16,9 @@ async function main() {
 
   //Deploy Attester
   const Attester = await hre.ethers.getContractFactory('SemaphoreAttester');
-  const attester = await Attester.attach("0xa513E6E4b8f2a923D98304ec87F64353C4D5C853")
+  const attester = await Attester.attach("0x99bbA657f2BbC93c02D617f8bA121cB8Fc104Acf")
 
-  attester.bindSemaphoreGroup("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9", 42);
+  attester.bindSemaphoreGroup("0x976EA74026E726554dB657fA54763abd0C3a0aa9", 42);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

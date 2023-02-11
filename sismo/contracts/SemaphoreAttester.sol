@@ -5,7 +5,6 @@ pragma solidity ^0.8.14;
 import "../ISemaphore.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 // Core protocol Protocol imports
 // sismo/sismo-protocol-main/contracts/core
@@ -15,11 +14,11 @@ import {Attester, IAttester, IAttestationsRegistry} from './sismo-protocol-main/
 contract SemaphoreAttester is Attester, Ownable {
 
   struct SemaphoreProof {
-    bytes32 signal;
+    uint256 groupId;
     uint256 merkleTreeRoot;
+    bytes32 signal;
     uint256 nullifierHash;
     uint256 externalNullifier;
-    uint256 groupId;
     address contractAddress;
   }
 
@@ -51,19 +50,20 @@ contract SemaphoreAttester is Attester, Ownable {
 
   function _verifyRequest(Request calldata request, bytes calldata proofData) internal virtual override
   {
-    // SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
+    SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
 
-    // // Init semaphore interface
-    // semaphore = ISemaphore(extraData.contractAddress);
+    // Init semaphore interface
+    semaphore = ISemaphore(extraData.contractAddress);
 
-    // semaphore.verifyProof(
-    //   extraData.groupId,
-    //   extraData.merkleTreeRoot,
-    //   extraData.signal,
-    //   extraData.nullifierHash,
-    //   extraData.externalNullifier,
-    //   abi.decode(proofData, (uint256[8]))
-    // );
+    semaphore.verifyProof(
+      extraData.groupId,
+      extraData.merkleTreeRoot,
+      extraData.signal,
+      extraData.nullifierHash,
+      extraData.externalNullifier,
+      abi.decode(proofData, (uint256[8]))
+    );
+
   }
 
   function buildAttestations(
@@ -78,10 +78,10 @@ contract SemaphoreAttester is Attester, Ownable {
 
     require(_collectionsInternalMapping[extraData.contractAddress][extraData.groupId] != 0, "Group not added to the Attester");
 
-    // uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + _collectionsInternalMapping[extraData.contractAddress][extraData.groupId];
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + _collectionsInternalMapping[extraData.contractAddress][extraData.groupId];
 
     attestations[0] = Attestation(
-      10001,
+      attestationCollectionId,
       request.destination,
       address(this),
       claim.claimedValue,
