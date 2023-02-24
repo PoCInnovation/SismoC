@@ -1,0 +1,11 @@
+{
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "hardhat": "^2.12.6"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0",
+    "openzeppelin-solidity": "^4.6.0"
+  }
+}
