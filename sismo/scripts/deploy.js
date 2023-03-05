@@ -43,7 +43,7 @@ async function main() {
   await badges.connect(owner).grantRole(even_trigger_role, registry.address);
   await badges.connect(owner).setAttestationsRegistry(registry.address);
   await registry.connect(owner).authorizeRange(attester.address, collectionIdFirst, collectionIdLast);
-  await attester.bindSemaphoreGroup("0x18E317A7D70d8fBf8e6E893616b52390EbBdb629", 42);
+  await attester.bindSemaphoreGroup("0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B", 42);
   // await attester.connect(owner).addGroup(42);
 }
 

@@ -9,8 +9,8 @@ import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof";
 const Web3js = require("web3");
 const ethers = require("ethers");
 
-const contractAddress = "0x18E317A7D70d8fBf8e6E893616b52390EbBdb629";
-const attesterAddress = "0x22753E4264FDDc6181dc7cce468904A80a363E44";
+const contractAddress = "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B";
+const attesterAddress = "0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5";
 
 function App() {
   const [identity, setIdentity] = useState<Identity | null>(null);
@@ -81,10 +81,28 @@ function App() {
     );
     const rec = await contract.methods
       .vote(
-        greeting,
-        proof.publicSignals.merkleRoot,
-        proof.publicSignals.nullifierHash,
-        solidityProof
+        web3.eth.abi.encodeParameter(
+          {
+            SemaphoreProof: {
+              signal: "uint256",
+              merkleTreeRoot: "uint256",
+              nullifierHash: "uint256",
+              externalNullifierHash: "uint256",
+              groupId: "uint256",
+              contractAddress: "address",
+            },
+          },
+          {
+            signal: greeting,
+            merkleTreeRoot: proof.publicSignals.merkleRoot,
+            nullifierHash: proof.publicSignals.nullifierHash,
+            externalNullifierHash: 0,
+            groupId: 42,
+            contractAddress:
+              "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
+          }
+        ),
+        web3.eth.abi.encodeParameter("uint256[8]", solidityProof)
       )
       .send({ from: window.ethereum.selectedAddress });
     console.log(rec);
@@ -130,7 +148,7 @@ function App() {
                 extraData: web3.eth.abi.encodeParameter(
                   {
                     SemaphoreProof: {
-                      signal: "bytes32",
+                      signal: "uint256",
                       merkleTreeRoot: "uint256",
                       nullifierHash: "uint256",
                       externalNullifierHash: "uint256",
@@ -145,7 +163,7 @@ function App() {
                     externalNullifierHash: 0,
                     groupId: 42,
                     contractAddress:
-                      "0x18E317A7D70d8fBf8e6E893616b52390EbBdb629",
+                      "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B",
                   }
                 ),
               },

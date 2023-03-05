@@ -15,7 +15,7 @@ import {Attester, IAttester, IAttestationsRegistry} from './sismo-protocol-main/
 contract SemaphoreAttester is Attester, Ownable {
 
   struct SemaphoreProof {
-    bytes32 signal;
+    uint256 signal;
     uint256 merkleTreeRoot;
     uint256 nullifierHash;
     uint256 externalNullifier;
@@ -51,19 +51,22 @@ contract SemaphoreAttester is Attester, Ownable {
 
   function _verifyRequest(Request calldata request, bytes calldata proofData) internal virtual override
   {
-    // SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
+    SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
 
-    // // Init semaphore interface
-    // semaphore = ISemaphore(extraData.contractAddress);
+    console.log(" extraData.contractAddress --> %s ", extraData.contractAddress);
+    console.log("extraData.groupId --> %d ", extraData.groupId);
+    console.log("LEOOOOOO ---> %d", _collectionsInternalMapping[extraData.contractAddress][extraData.groupId]);
+    // Init semaphore interface
+    semaphore = ISemaphore(extraData.contractAddress);
 
-    // semaphore.verifyProof(
-    //   extraData.groupId,
-    //   extraData.merkleTreeRoot,
-    //   extraData.signal,
-    //   extraData.nullifierHash,
-    //   extraData.externalNullifier,
-    //   abi.decode(proofData, (uint256[8]))
-    // );
+    semaphore.verifyProof(
+      extraData.groupId,
+      extraData.merkleTreeRoot,
+      extraData.signal,
+      extraData.nullifierHash,
+      extraData.externalNullifier,
+      abi.decode(proofData, (uint256[8]))
+    );
 
   }
 

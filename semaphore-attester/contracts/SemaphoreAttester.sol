@@ -33,7 +33,6 @@ abstract contract SemaphoreAttester is Attester {
     ISemaphore public semaphore;
 
     // Store groupId and semaphore contract address
-    mapping (semaphore contract -> groupID -> registryID);
 
     /*******************************************************
         INITIALIZATION FUNCTIONS
@@ -74,7 +73,6 @@ abstract contract SemaphoreAttester is Attester {
     ) internal virtual override {
         // Decode proofData in SemaphoreProof struct
         SemaphoreProof memory extraData = abi.decode(request.claims[0], (SemaphoreProof));
-        uint256 groupId = extraData.signal;
 
         // Verify sempahore ZK-Proof provided by the user
         semaphore.verifyProof(groupId, extraData.merkleTreeRoot, extraData.signal, extraData.externalNullifier, groupId, proofData);
