@@ -1,5 +1,3 @@
-> If you see this section, you've just created a repository using [PoC Innovation's Open-Source project template](https://github.com/PoCInnovation/open-source-project-template). Check the [getting started guide](./.github/getting-started.md).
-
 # SismoC
 
 Creation of a zero-knowledge attester on chain, using the Semaphore protocol, with the goal of integrating it with the other Sismo attesters.
