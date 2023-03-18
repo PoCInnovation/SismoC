@@ -13,6 +13,8 @@ Creation of a zero-knowledge attester on chain, using the Semaphore protocol, wi
 ### Installation
 ⚠️ To use this project, please be sure to run the following command at the root of the repository : `nvm use`
 
+Clone the [sismo-core repository](https://github.com/sismo-core/sismo-protocol) as `sismo-protocol-main/` in `./sismo/contracts` to make the attester works
+
 You must install all dependencies for the Semaphore application, Semaphore contract and Sismo attester using `npm install` or `yarn`.
 
 ### Usage
