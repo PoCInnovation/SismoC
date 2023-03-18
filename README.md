@@ -4,7 +4,9 @@ Creation of a zero-knowledge attester on chain, using the Semaphore protocol, wi
 
 ## How does it work?
 
-[Explain how this project is working]
+<div align="center">
+  <img src=".github/assets/AttesterExplained.png" />
+</div>
 
 ## Getting Started
 
