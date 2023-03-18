@@ -11,16 +11,26 @@ Creation of a zero-knowledge attester on chain, using the Semaphore protocol, wi
 ## Getting Started
 
 ### Installation
+⚠️ To use this project, please be sure to run the following command at the root of the repository : `nvm use`
 
-[Explain how to install all of the project's dependencies]
+Clone the [sismo-core repository](https://github.com/sismo-core/sismo-protocol) as `sismo-protocol-main/` in `./sismo/contracts` to make the attester works
 
-### Quickstart
-
-[Explain how to run this project]
+You must install all dependencies for the Semaphore application, Semaphore contract and Sismo attester using `npm install` or `yarn`.
 
 ### Usage
+#### Setup project
+1. Deploy the Semaphore contracts
+2. Setup a `./sismo/.env` using `./sismo/.env.example`
+3. Deploy the Attester contracts
+4. Setup a `./semaphore-app/.env` using `./semaphore-app/.env.example`
+5. Run the Semaphore app : `yarn start`
 
-[Explain how to use this project]
+#### Create semaphore identity & get attestation
+On the Semaphore app, follow the instructions on the user interface
+
+1. Create identidy
+2. Join Group
+3. Generate attestation
 
 ## Get involved
 
@@ -31,7 +41,7 @@ If you're interested in how the project is organized at a higher level, please c
 ## Our PoC team :heart:
 
 Developers
-| [<img src="https://github.com/MrSIooth.png?size=85" width=85><br><sub>Victor Guyot</sub>](https://github.com/MrSIooth) | [<img src="https://github.com/Alex-Prevot.png?size=85" width=85><br><sub>Alex PREVOT</sub>](https://github.com/Alex-Prevot) | [<img src="https://github.com/ZerLock.png?size=85" width=85><br><sub>Léo Dubosclard</sub>](https://github.com/ZerLock)
+| [<img src="https://github.com/ZerLock.png?size=85" width=85><br><sub>Léo Dubosclard</sub>](https://github.com/ZerLock) | [<img src="https://github.com/Alex-Prevot.png?size=85" width=85><br><sub>Alex PREVOT</sub>](https://github.com/Alex-Prevot) | [<img src="https://github.com/MrSIooth.png?size=85" width=85><br><sub>Victor Guyot</sub>](https://github.com/MrSIooth)
 | :---: | :---: | :---: |
 
 Manager
