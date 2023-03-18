@@ -55,7 +55,7 @@ interface ISemaphore {
     /// @param nullifierHash: Nullifier hash.
     /// @param externalNullifier: External nullifier.
     /// @param proof: Zero-knowledge proof.
-    function verifyProof(
+    function    (
         uint256 groupId,
         uint256 merkleTreeRoot,
         uint256 signal,

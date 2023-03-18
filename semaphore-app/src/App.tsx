@@ -9,8 +9,8 @@ import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof";
 const Web3js = require("web3");
 const ethers = require("ethers");
 
-const contractAddress = "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B";
-const attesterAddress = "0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5";
+const contractAddress = process.env.REACT_APP_GREETER_ADDRESS || "";
+const attesterAddress = process.env.REACT_APP_ATTESTER_ADDRESS || "";
 
 function App() {
   const [identity, setIdentity] = useState<Identity | null>(null);
@@ -51,62 +51,19 @@ function App() {
   async function vote() {
     if (!identity) return;
 
-    console.log(contract);
-    const groupTemp = new Group();
-    const users = await contract.methods
-      .getCommitments()
-      .call({ from: window.ethereum.selectedAddress });
-    console.log("user -> ", users);
-    const groupId = await contract.methods
-      .groupId()
-      .call({ from: window.ethereum.selectedAddress });
-    console.log("groupId -> ", users);
-    console.log(users, groupId);
-    groupTemp.addMembers(users);
+      const groupTemp = new Group()
+      const users = await contract.methods.getCommitments().call({ from: window.ethereum.selectedAddress })
+      const groupId = await contract.methods.groupId().call({ from: window.ethereum.selectedAddress })
+      groupTemp.addMembers(users)
 
-    const greeting = ethers.utils.formatBytes32String("Hello World");
+      const greeting = ethers.utils.formatBytes32String("Hello World")
 
-    const proof = await generateProof(identity, groupTemp, groupId, greeting);
-    const solidityProof = packToSolidityProof(proof.proof);
+      const proof = await generateProof(identity, groupTemp, groupId, greeting)
+      const solidityProof = packToSolidityProof(proof.proof)
 
-    console.log("great", greeting);
-    console.log(
-      greeting,
-      " , ",
-      proof.publicSignals.merkleRoot,
-      " , ",
-      proof.publicSignals.nullifierHash,
-      " , ",
-      solidityProof
-    );
-    const rec = await contract.methods
-      .vote(
-        web3.eth.abi.encodeParameter(
-          {
-            SemaphoreProof: {
-              signal: "uint256",
-              merkleTreeRoot: "uint256",
-              nullifierHash: "uint256",
-              externalNullifierHash: "uint256",
-              groupId: "uint256",
-              contractAddress: "address",
-            },
-          },
-          {
-            signal: greeting,
-            merkleTreeRoot: proof.publicSignals.merkleRoot,
-            nullifierHash: proof.publicSignals.nullifierHash,
-            externalNullifierHash: 0,
-            groupId: 42,
-            contractAddress:
-              "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
-          }
-        ),
-        web3.eth.abi.encodeParameter("uint256[8]", solidityProof)
-      )
-      .send({ from: window.ethereum.selectedAddress });
+    const rec = await contract.methods.vote(greeting, proof.publicSignals.merkleRoot, proof.publicSignals.nullifierHash, solidityProof).send({ from: window.ethereum.selectedAddress });
     console.log(rec);
-  }
+    }
 
   async function getAttesttation() {
     if (!identity) return;
@@ -118,24 +75,12 @@ function App() {
     const groupId = await contract.methods
       .groupId()
       .call({ from: window.ethereum.selectedAddress });
-    console.log("user -> ", users, "  groupId ----> ", groupId);
     groupTemp.addMembers(users);
 
     const greeting = ethers.utils.formatBytes32String("Hello World");
 
     const proof = await generateProof(identity, groupTemp, groupId, greeting);
     const solidityProof = packToSolidityProof(proof.proof);
-
-    console.log("great", greeting);
-    console.log(
-      greeting,
-      " , ",
-      proof.publicSignals.merkleRoot,
-      " , ",
-      proof.publicSignals.nullifierHash,
-      " , ",
-      solidityProof
-    );
 
     try {
       const rec = await attester.methods
@@ -162,13 +107,12 @@ function App() {
                     nullifierHash: proof.publicSignals.nullifierHash,
                     externalNullifierHash: 0,
                     groupId: 42,
-                    contractAddress:
-                      "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B",
+                    contractAddress: process.env.REACT_APP_SEMAPHORE_ADDRESS || "",
                   }
                 ),
               },
             ],
-            destination: "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+            destination: process.env.REACT_APP_DESTINATION_ADDRESS || "",
           },
           web3.eth.abi.encodeParameter("uint256[8]", solidityProof)
         )
@@ -181,15 +125,15 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <button onClick={createIdentity}>Create Identity</button>
-        {identity && (
-          <p style={{ width: "50vh", fontSize: "12px" }}>
-            {(identity as any).toString()}
-          </p>
-        )}
-        <button onClick={joinGroup}>Join group</button>
+          <button onClick={createIdentity}>Create Identity</button>
+          {identity && (
+            <p style={{ width: "50vh", fontSize: "12px" }}>
+              {(identity as any).toString()}
+            </p>
+          )}
+          <button onClick={joinGroup}>Join group</button>
+          <button onClick={getAttesttation}>Generate attestation</button>
         <button onClick={vote}>vote</button>
-        <button onClick={getAttesttation}>SISMOOOO</button>
       </header>
     </div>
   );

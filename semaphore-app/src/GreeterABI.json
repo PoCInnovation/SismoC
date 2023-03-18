@@ -96,14 +96,24 @@
   {
     "inputs": [
       {
-        "internalType": "bytes",
-        "name": "extra",
-        "type": "bytes"
+        "internalType": "bytes32",
+        "name": "myVote",
+        "type": "bytes32"
       },
       {
-        "internalType": "bytes",
-        "name": "proofData",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "merkleTreeRoot",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nullifierHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[8]",
+        "name": "proof",
+        "type": "uint256[8]"
       }
     ],
     "name": "vote",

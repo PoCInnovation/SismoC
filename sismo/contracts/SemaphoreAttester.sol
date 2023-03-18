@@ -5,15 +5,19 @@ pragma solidity ^0.8.14;
 import "../ISemaphore.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 // Core protocol Protocol imports
 // sismo/sismo-protocol-main/contracts/core
 import {Request, Attestation, Claim} from './sismo-protocol-main/contracts/core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './sismo-protocol-main/contracts/core/Attester.sol';
 
+/**
+ * @title Semaphore Attester
+ * @author PoC Innovation
+ */
 contract SemaphoreAttester is Attester, Ownable {
 
+  // Structure passed as a parameter as proofData containing everything the attester needs to work
   struct SemaphoreProof {
     uint256 signal;
     uint256 merkleTreeRoot;
@@ -26,6 +30,7 @@ contract SemaphoreAttester is Attester, Ownable {
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
 
+  // List of contracts and group ids handled by the attester
   mapping(address => mapping(uint256 => uint256)) public _collectionsInternalMapping;
   uint256 public _collectionsInternalMappingLength = 0;
 
@@ -34,6 +39,7 @@ contract SemaphoreAttester is Attester, Ownable {
 
   /**
    * @dev Constructor. Initializes the contract
+   * @param owner Address of the attester owner
    * @param attestationsRegistryAddress Attestations Registry contract on which the attester will write attestations
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
@@ -49,16 +55,19 @@ contract SemaphoreAttester is Attester, Ownable {
     _transferOwnership(owner);
   }
 
+  /**
+   * @dev It should verify the user request is valid
+   * @param request User request
+   * @param proofData Data sent along the request to prove its validity
+   */
   function _verifyRequest(Request calldata request, bytes calldata proofData) internal virtual override
   {
     SemaphoreProof memory extraData = abi.decode(request.claims[0].extraData, (SemaphoreProof));
 
-    console.log(" extraData.contractAddress --> %s ", extraData.contractAddress);
-    console.log("extraData.groupId --> %d ", extraData.groupId);
-    console.log("LEOOOOOO ---> %d", _collectionsInternalMapping[extraData.contractAddress][extraData.groupId]);
     // Init semaphore interface
     semaphore = ISemaphore(extraData.contractAddress);
 
+    // Verify the user proof using verifyProof from semaphore interface
     semaphore.verifyProof(
       extraData.groupId,
       extraData.merkleTreeRoot,
@@ -67,12 +76,17 @@ contract SemaphoreAttester is Attester, Ownable {
       extraData.externalNullifier,
       abi.decode(proofData, (uint256[8]))
     );
-
   }
 
+  /**
+   * @dev It should build attestations from the user request and the proof
+   * @param request User request
+   * @param proofData Data sent along the request to prove its validity
+   * @return attestations Attestations that will be recorded
+   */
   function buildAttestations(
     Request calldata request,
-    bytes calldata
+    bytes calldata proofData
   ) public view virtual override returns (Attestation[] memory) {
     Claim memory claim = request.claims[0];
 
@@ -80,13 +94,12 @@ contract SemaphoreAttester is Attester, Ownable {
 
     Attestation[] memory attestations = new Attestation[](1);
 
-    console.log(" extraData.contractAddress --> %s ", extraData.contractAddress);
-    console.log("extraData.groupId --> %d ", extraData.groupId);
-    console.log("LEOOOOOO ---> %d", _collectionsInternalMapping[extraData.contractAddress][extraData.groupId]);
+    // Check if the group of the contract is handled by the attester
     require(_collectionsInternalMapping[extraData.contractAddress][extraData.groupId] != 0, "Group not added to the Attester");
 
     uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + _collectionsInternalMapping[extraData.contractAddress][extraData.groupId];
 
+    // Create attestation
     attestations[0] = Attestation(
       attestationCollectionId,
       request.destination,
@@ -98,9 +111,13 @@ contract SemaphoreAttester is Attester, Ownable {
     return (attestations);
   }
 
+  /**
+   * @dev Add a Semaphore contract to the list of contracts handled by the attester
+   * @param _semaphoreAddress Semaphore contract address to handle
+   * @param _groupId Group ID of the Semaphore contract to be handled by the attester
+   */
   function bindSemaphoreGroup(address _semaphoreAddress, uint256 _groupId) public {
     _collectionsInternalMappingLength++;
-    console.log("_collectionsInternalMappingLength ---> %d ", _collectionsInternalMappingLength);
     _collectionsInternalMapping[_semaphoreAddress][_groupId] = _collectionsInternalMappingLength;
   }
 

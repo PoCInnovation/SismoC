@@ -32,19 +32,12 @@ async function main() {
   await attester.deployed();
   console.log(`Attester deployed to ${attester.address}`);
 
-  //Deploy Token
-  // const Token = await hre.ethers.getContractFactory('myERC20');
-  // const token = await Token.deploy(owner.address, "IsmaToken", "ISMA");
-  // await token.deployed();
-  // console.log(`Token deployed to ${token.address}`);
-
   //Set up Roles / group id
   even_trigger_role = await badges.connect(owner).EVENT_TRIGGERER_ROLE();
   await badges.connect(owner).grantRole(even_trigger_role, registry.address);
   await badges.connect(owner).setAttestationsRegistry(registry.address);
   await registry.connect(owner).authorizeRange(attester.address, collectionIdFirst, collectionIdLast);
-  await attester.bindSemaphoreGroup("0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B", 42);
-  // await attester.connect(owner).addGroup(42);
+  await attester.bindSemaphoreGroup(process.env.SEMAPHORE_ADDRESS || "", 42);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
